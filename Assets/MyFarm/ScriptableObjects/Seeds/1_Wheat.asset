@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 1_Wheat
   m_EditorClassIdentifier: 
   displayName: Wheat
-  growthTime: 60000
-  decayTime: 120000
+  growthTime: 60
+  decayTime: 120
   buyPrice: 5
   sellingPrice: 8
   sprite: {fileID: 21300000, guid: 0cd9fb36e78cc214fb2cbf45e387c664, type: 3}

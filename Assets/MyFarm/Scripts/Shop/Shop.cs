@@ -9,7 +9,6 @@ namespace MyFarm.Scripts.Shop
     {
         private static GameAsset _gameAsset => GameManager.GameManager.GameAsset;
         private static GameConfig _gameConfig => GameManager.GameManager.GameConfig;
-        private static GameData _gameData => GameManager.GameManager.GameData;
         
         public static Action<ShopPanel> OnShopPanelClick;
         public static ShopPanel shopPanelSelected = null;
@@ -34,6 +33,7 @@ namespace MyFarm.Scripts.Shop
                 panel.seedImage.sprite = seed.shopSprite;
                 panel.seedName.text = seed.displayName;
                 panel.seedPrice.text = seed.buyPrice + "$";
+                panel.SeedType = index;
             }
         }
     }

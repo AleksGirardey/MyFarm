@@ -1,3 +1,4 @@
+using System;
 using MyFarm.Scripts.GameManager;
 using MyFarm.Scripts.Seeds;
 using MyFarm.Scripts.Shop;
@@ -26,15 +27,16 @@ namespace MyFarm.Scripts.Farms
 
         public GameObject progressionFiller;
         public TextMeshProUGUI timerText;
+        public TextMeshProUGUI sellText;
         public Image growthFiller;
         public Image decayFiller;
 
-        // public Button harvestButton;
+        public ParticleSystem HarvestReadyParticleSystem;
         
         #endregion
         
         private int _seedType;
-        private float _plantTimestamp;
+        private DateTime _plantTimestamp;
         private bool _harvestReady;
 
         public bool HarvestReady
@@ -42,8 +44,19 @@ namespace MyFarm.Scripts.Farms
             get { return _harvestReady; }
             private set
             {
+                if (value)
+                {
+                    HarvestReadyParticleSystem.Play();
+                    sellText.enabled = true;
+                    sellText.text = "Sell for " + _seed.sellingPrice + "$";
+                }
+                else
+                {
+                    sellText.enabled = false;
+                    HarvestReadyParticleSystem.Stop();
+                }
+
                 _harvestReady = value;
-                // harvestButton.gameObject.SetActive(value);
             }
         }
 
@@ -58,7 +71,7 @@ namespace MyFarm.Scripts.Farms
             }
         }
 
-        public float PlantTimestamp
+        public DateTime PlantTimestamp
         {
             get => _plantTimestamp;
             set
@@ -82,11 +95,15 @@ namespace MyFarm.Scripts.Farms
             if (_seedType == -1)
             {
                 seedNameText.text = "";
-                seedImage.sprite = _gameAsset.emptySprite;
+                seedNameText.gameObject.SetActive(false);
+                seedImage.sprite = _gameAsset.emptyFarmPlotSprite;
+                seedImage.fillAmount = 1;
                 return;
             }
-
+            
+            seedNameText.gameObject.SetActive(true);
             seedNameText.text = _seed.displayName;
+            seedImage.fillAmount = 0;
             seedImage.sprite = _seed.sprite;
         }
 
@@ -94,16 +111,19 @@ namespace MyFarm.Scripts.Farms
         {
             if (_seedType == -1) return;
 
-            float harvestTime = _plantTimestamp + _seed.growthTime;
-            float decayTime = harvestTime + _seed.decayTime;
-            float now = Time.time * 1000;
+            DateTime harvestTime = _plantTimestamp.AddSeconds(_seed.growthTime / Time.timeScale);
+            DateTime decayTime = harvestTime.AddSeconds(_seed.decayTime / Time.timeScale);
+            DateTime now = DateTime.Now;
 
+            
             progressionFiller.SetActive(true);
 
             if (now < harvestTime) // Growing
             {
                 HarvestReady = false;
-                float ratio = Mathf.Clamp01((harvestTime * now) / _plantTimestamp);
+                TimeSpan timeSpanHarvest = harvestTime - _plantTimestamp;
+                TimeSpan timeSpanNow = now - _plantTimestamp;
+                float ratio = Mathf.Clamp01((float) (timeSpanNow.TotalSeconds / timeSpanHarvest.TotalSeconds));
 
                 seedImage.fillAmount = ratio;
                 growthFiller.fillAmount = ratio;
@@ -111,8 +131,11 @@ namespace MyFarm.Scripts.Farms
 
                 statusNameText.text = GROWING_STATUS_TEXT;
 
-                int minLeft = Mathf.FloorToInt(((harvestTime - now) / 1000) / 60);
-                int secLeft = Mathf.FloorToInt(((harvestTime - now) / 1000) % 60);
+                TimeSpan timeSpanLeft = harvestTime - now;
+                
+                int minLeft = Convert.ToInt32(timeSpanLeft.Minutes);
+                int secLeft = Convert.ToInt32(timeSpanLeft.Seconds);
+                
                 string timeLeft = "";
 
                 if (minLeft > 0) timeLeft += (minLeft + "min");
@@ -122,7 +145,9 @@ namespace MyFarm.Scripts.Farms
             } else if (now >= harvestTime && now < decayTime) // Ready but decaying
             {
                 HarvestReady = true;
-                float ratio = Mathf.Clamp01((decayTime * now) / harvestTime);
+                TimeSpan timeSpanDecay = decayTime - harvestTime;
+                TimeSpan timeSpanNow = now - harvestTime;
+                float ratio = Mathf.Clamp01((float) (timeSpanNow.TotalSeconds / timeSpanDecay.TotalSeconds));
 
                 seedImage.fillAmount = 1;
                 growthFiller.fillAmount = 1;
@@ -130,8 +155,11 @@ namespace MyFarm.Scripts.Farms
 
                 statusNameText.text = READY_STATUS_TEXT;
 
-                int minLeft = Mathf.FloorToInt(((decayTime - now) / 1000) / 60);
-                int secLeft = Mathf.FloorToInt(((decayTime - now) / 1000) % 60);
+                TimeSpan timeSpanLeft = decayTime - now;
+                
+                int minLeft = Convert.ToInt32(timeSpanLeft.Minutes);
+                int secLeft = Convert.ToInt32(timeSpanLeft.Seconds);
+                
                 string timeLeft = "";
 
                 if (minLeft > 0) timeLeft += (minLeft + "min");
@@ -141,7 +169,13 @@ namespace MyFarm.Scripts.Farms
             }
             else // Decayed
             {
-                Reset();
+                if (_gameData.Farmers > 0)
+                {
+                    _gameData.Farmers -= 1;
+                    OnHarvestClick();
+                }
+                else
+                    Reset();
             }
         }
 
@@ -155,7 +189,7 @@ namespace MyFarm.Scripts.Farms
             progressionFiller.SetActive(false);
             
             SeedType = -1;
-            PlantTimestamp = -1;
+            PlantTimestamp = DateTime.Now;
         }
 
         public void OnHarvestClick()
@@ -178,8 +212,9 @@ namespace MyFarm.Scripts.Farms
             int requiredMoney = _gameConfig.availableSeeds[seedToPlant].buyPrice;
 
             if (_gameData.PlayerMoney < requiredMoney) return;
-            
-            PlantTimestamp = Time.time * 1000;
+
+            _gameData.PlayerMoney -= requiredMoney;
+            PlantTimestamp = DateTime.Now;
             SeedType = seedToPlant;
         }
     }

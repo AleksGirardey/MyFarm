@@ -1,3 +1,4 @@
+using System;
 using MyFarm.Scripts.GameManager;
 using TMPro;
 using UnityEngine;
@@ -57,12 +58,13 @@ namespace MyFarm.Scripts.Farms
             return _plots[index];
         }
 
-        public void SetFarmPlot(int index, int seedType, float timestamp)
+        public void SetFarmPlot(int index, int seedType, DateTime timestamp)
         {
             FarmPlot farmPlot = Instantiate(_gameAsset.farmPlotPrefab, plotsParent);
 
             farmPlot.gameObject.name = "Plot[" + index + "]";
 
+            _plots[index] = farmPlot;
             farmPlot.Reset();
             farmPlot.SeedType = seedType;
             farmPlot.PlantTimestamp = timestamp;
@@ -75,7 +77,7 @@ namespace MyFarm.Scripts.Farms
 
             for (int index = 0; index < _plots.Length; ++index)
             {
-                SetFarmPlot(index, -1, -1);
+                SetFarmPlot(index, -1, DateTime.Now);
             }
         }
 

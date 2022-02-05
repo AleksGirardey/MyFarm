@@ -15,7 +15,8 @@ namespace MyFarm.Scripts.GameManager
         [Space]
         public int defaultFarmFieldPrice = 100;
         public int defaultFarmFieldPriceRatio = 2;
-        [Header("Seeds")]
+        [Header("Shop")]
         public Seed[] availableSeeds;
+        public int defaultFarmerPrice = 30;
     }
 }

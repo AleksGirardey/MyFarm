@@ -14,7 +14,7 @@ namespace MyFarm.Scripts.Farms
 
         #region UNITY_CALLS
 
-        private void Awake()
+        private void Start()
         {
             CreateInstance();
 
@@ -43,16 +43,16 @@ namespace MyFarm.Scripts.Farms
             if (PlayerPrefs.HasKey("IsInit")) return false;
             
             PlayerPrefs.SetInt("IsInit", 1);
+            PlayerPrefs.Save();
 
             _gameData.PlayerMoney = _gameConfig.defaultPlayerStartingMoney;
             
             for (int index = 0; index < count; ++index)
             {
                 FarmField field = InstantiateFarmField(index);
-                field.Init(index < 1, index * _gameConfig.defaultFarmFieldPriceRatio * _gameConfig.defaultFarmFieldPrice);
+                field.Init(index < _gameConfig.defaultFarmUnlocked, index * _gameConfig.defaultFarmFieldPriceRatio * _gameConfig.defaultFarmFieldPrice);
             }
             
-            PlayerPrefs.Save();
             return true;
         }
 

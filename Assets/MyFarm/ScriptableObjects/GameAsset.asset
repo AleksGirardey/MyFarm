@@ -15,4 +15,5 @@ MonoBehaviour:
   emptySprite: {fileID: 21300000, guid: 167d7215fbfe5ca4a965520c37ced761, type: 3}
   farmFieldPrefab: {fileID: 3318310865382562733, guid: d6fb633104f8c114286cc5003c44bce2, type: 3}
   farmPlotPrefab: {fileID: 4320825371099174065, guid: 873e9d178caccf84ca14f674e20217ca, type: 3}
+  emptyFarmPlotSprite: {fileID: 21300000, guid: dd32b712bb631ca48b66000167dddf4b, type: 3}
   shopPanelPrefab: {fileID: 7930322728353506665, guid: 792835d0c0ab427449409bf57ea83a13, type: 3}

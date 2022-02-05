@@ -9,8 +9,8 @@ namespace MyFarm.Scripts.Seeds
         
         [Space]
         [Header("Farming")]
-        [Tooltip("Expressed in milliseconds")] public float growthTime = 120000;
-        [Tooltip("Expressed in milliseconds")] public float decayTime = 600000;
+        [Tooltip("Expressed in Seconds")] public float growthTime = 120;
+        [Tooltip("Expressed in Seconds")] public float decayTime = 600;
 
         [Space]
         [Header("Buy/Sell Price")]

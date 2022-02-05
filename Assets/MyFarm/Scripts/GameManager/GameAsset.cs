@@ -14,6 +14,7 @@ namespace MyFarm.Scripts.GameManager
         
         public FarmField farmFieldPrefab;
         public FarmPlot farmPlotPrefab;
+        public Sprite emptyFarmPlotSprite;
 
         [Header("Shop")]
         public ShopPanel shopPanelPrefab;

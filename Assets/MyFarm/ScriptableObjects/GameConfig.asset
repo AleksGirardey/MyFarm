@@ -17,7 +17,7 @@ MonoBehaviour:
   defaultFarmPlotsPerField: 4
   defaultFarmFieldCount: 4
   defaultFarmFieldPrice: 100
-  defaultFarmFieldPriceRatio: 2
+  defaultFarmFieldPriceRatio: 1
   availableSeeds:
   - {fileID: 11400000, guid: 3c76dcebb5f17fb46a8cc772432a8c9c, type: 2}
   - {fileID: 11400000, guid: ef511cd81c8eeef4cb0985d01a60b20a, type: 2}

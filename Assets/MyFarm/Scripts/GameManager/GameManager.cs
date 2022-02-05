@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace MyFarm.Scripts.GameManager
@@ -20,14 +19,16 @@ namespace MyFarm.Scripts.GameManager
         private void Awake()
         {
             if (Instance == null) Instance = this;
-            if (Instance == this)
-            {
-                if (_gameData != null) _gameData.Load();
-                return;
-            }
+            if (Instance == this) return;
             
             Debug.LogWarning("Two GameManager present on this scene. Deleting this one !", this);
             Destroy(gameObject);
+        }
+
+        private void Start()
+        {
+            Time.timeScale = 1;
+            _gameData?.Load();
         }
 
         private void FixedUpdate()
@@ -37,6 +38,18 @@ namespace MyFarm.Scripts.GameManager
 
         #endregion
 
+        #region CheatFunctions
+
+        public void GiveMoney()
+        {
+            _gameData.PlayerMoney += 100;
+        }
+
+        public void Speed(float value)
+        {
+            Time.timeScale = value;
+        }
         
+        #endregion
     }
 }

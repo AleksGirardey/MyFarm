@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 2_Corn
   m_EditorClassIdentifier: 
   displayName: Corn
-  growthTime: 120000
-  decayTime: 240000
+  growthTime: 120
+  decayTime: 240
   buyPrice: 6
   sellingPrice: 10
   sprite: {fileID: 21300000, guid: 9decf1189fe0ca044baf9f8fc2722f3b, type: 3}

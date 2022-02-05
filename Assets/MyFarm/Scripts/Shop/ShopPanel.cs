@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,6 +35,7 @@ namespace MyFarm.Scripts.Shop
             {
                 signBorder.SetActive(false);
                 Shop.shopPanelSelected = null;
+                return;
             }
 
             signBorder.SetActive(true);

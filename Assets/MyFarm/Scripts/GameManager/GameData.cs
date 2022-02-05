@@ -1,5 +1,6 @@
+using System;
 using MyFarm.Scripts.Farms;
-using MyFarm.Scripts.Shop;
+using MyFarm.Scripts.Ui;
 using UnityEngine;
 
 namespace MyFarm.Scripts.GameManager
@@ -8,12 +9,13 @@ namespace MyFarm.Scripts.GameManager
     public class GameData : ScriptableObject
     {
         private static string entry_playerMoney = "PlayerMoney";
-        // private static string entry_farmFieldUnlocked = "FarmFieldUnlocked";
+        private static string entry_playerFarmers = "PlayerFarmers";
         private static string entry_farmField = "FarmField";
         private static string entry_farmSlotType = "SlotType";
         private static string entry_cropTimestamp = "CropTimestamp";
 
         private int _playerMoney = 20;
+        private int _farmers = 0;
 
         private bool _isDirty = false;
 
@@ -25,15 +27,28 @@ namespace MyFarm.Scripts.GameManager
             set
             {
                 _isDirty = true;
+
+                bool gain = value > _playerMoney;
                 _playerMoney = value;
-                Money.OnPlayerMoneyChanged?.Invoke(_playerMoney);
+                Money.OnPlayerMoneyChanged?.Invoke(_playerMoney, gain);
+            }
+        }
+
+        public int Farmers
+        {
+            get => _farmers;
+            set
+            {
+                _isDirty = true;
+                
+                _farmers = value;
+                Farmer.OnFarmerCountChange?.Invoke(_farmers);
             }
         }
 
         public bool IsDirty
         {
-            get { return _isDirty; }
-            set { _isDirty = value; }
+            set => _isDirty = value;
         }
 
         private string GetFarmPrefix(int farmIndex)
@@ -46,18 +61,23 @@ namespace MyFarm.Scripts.GameManager
         public void Save()
         {
             if (!_isDirty) return;
-
+            
             PlayerPrefs.SetInt(entry_playerMoney, _playerMoney);
+            PlayerPrefs.SetInt(entry_playerFarmers, _farmers);
             
             for (int farmIndex = 0; farmIndex < GameManager.GameConfig.defaultFarmFieldCount; ++farmIndex)
             {
                 SaveFarmField(farmIndex);
             }
+            
+            PlayerPrefs.Save();
+            _isDirty = false;
         }
 
         public void Load()
         {
-            if (PlayerPrefs.HasKey(entry_playerMoney)) _playerMoney = PlayerPrefs.GetInt(entry_playerMoney);
+            _playerMoney = PlayerPrefs.GetInt(entry_playerMoney, GameManager.GameConfig.defaultPlayerStartingMoney);
+            _farmers = PlayerPrefs.GetInt(entry_playerFarmers, 0);
         }
 
         private void SaveFarmField(int farmIndex)
@@ -67,9 +87,9 @@ namespace MyFarm.Scripts.GameManager
             string timestampPrefix = GetFarmPrefix(farmIndex) + entry_cropTimestamp + "_";
             
             FarmField farmField = Farm.Instance.GetFarmField(farmIndex);
-
+            
             int type = -1;
-            float timestamp = -1f;
+            DateTime timestamp = DateTime.Now;
 
             if (farmField.IsUnlocked)
                 PlayerPrefs.SetInt(GetFarmPrefix(farmIndex), 1);
@@ -85,7 +105,7 @@ namespace MyFarm.Scripts.GameManager
                 }
                 
                 PlayerPrefs.SetInt(typePrefix + plotIndex, type);
-                PlayerPrefs.SetFloat(timestampPrefix + plotIndex, timestamp);
+                PlayerPrefs.SetString(timestampPrefix + plotIndex, timestamp.ToBinary().ToString());
             }
         }
 
@@ -98,18 +118,19 @@ namespace MyFarm.Scripts.GameManager
             bool fieldUnlock = IsFieldUnlock(farmField.FieldIndex); 
             
             if (fieldUnlock) farmField.Unlock();
-            else farmField.SetLocked(farmField.FieldIndex * 100);
+            else farmField.SetLocked(farmField.FieldIndex * GameManager.GameConfig.defaultFarmFieldPrice * GameManager.GameConfig.defaultFarmFieldPriceRatio);
 
             for (int index = 0; index < plotPerField; ++index)
             {
                 int type = PlayerPrefs.GetInt(typePrefix + index, -1);
-                float timestamp = PlayerPrefs.GetFloat(timestampPrefix + index, -1f);
+                string timestampBinary = PlayerPrefs.GetString(timestampPrefix + index, DateTime.Now.ToBinary().ToString());
+                DateTime timestamp = DateTime.FromBinary(Convert.ToInt64(timestampBinary));
 
                 farmField.SetFarmPlot(index, type, timestamp);
             }
         }
 
-        public bool IsFieldUnlock(int index)
+        private bool IsFieldUnlock(int index)
         {
             return PlayerPrefs.HasKey(GetFarmPrefix(index));
         }
@@ -118,6 +139,7 @@ namespace MyFarm.Scripts.GameManager
         {
             PlayerPrefs.DeleteAll();
             _playerMoney = GameManager.GameConfig.defaultPlayerStartingMoney;
+            _farmers = 0;
         }
     }
 }
