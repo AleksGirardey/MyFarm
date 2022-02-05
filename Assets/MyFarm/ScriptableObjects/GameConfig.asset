@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 716863b93aab4e8ab384135667db217b, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  defaultPlayerStartingMoney: 20
+  defaultFarmUnlocked: 1
+  defaultFarmPlotsPerField: 4
+  defaultFarmFieldCount: 4
+  defaultFarmFieldPrice: 100
+  defaultFarmFieldPriceRatio: 2
+  availableSeeds:
+  - {fileID: 11400000, guid: 3c76dcebb5f17fb46a8cc772432a8c9c, type: 2}
+  - {fileID: 11400000, guid: ef511cd81c8eeef4cb0985d01a60b20a, type: 2}
+  - {fileID: 11400000, guid: 92e9f686717c8e14a8a924f6dde629b9, type: 2}
